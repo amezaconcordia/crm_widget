@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+  </head>
+  <body>
+    <h2>This is a sample Widget built using Zoho Extension toolkit.</h2>
+  </body>
+  <div>
+    <h1>CRM Operations</h1>
+    <button id="api">API</button>
+    <button id="cf">Custom Function</button>
+    <button id="sdk">SDK API</button>
+    <button id="asnc">Async</button>
+    <button id="elim">Delete</button>
+  </div>
+  <script src="https://js.zohostatic.com/creator/widgets/version/1.0/widgetsdk-min.js"></script>
+  <script src="https://live.zwidgets.com/js-sdk/1.1/ZohoEmbededAppSDK.min.js"></script>
+  <script>
+    const btnApi = document.getElementById('api')
+    const btnSDK = document.getElementById('sdk')
+    const btnAsync = document.getElementById('asnc')
+    const btnFunction = document.getElementById('cf')
+    const btnElim = document.getElementById('elim')
+
+    ZOHO.embeddedApp.on('PageLoad', async function (data) {
+      console.log(data)
+      //Custom Bussiness logic goes here
+      const zoho_promise = await ZOHO.CRM.API.getRecord({
+        Entity: 'Deals',
+        RecordID: data.EntityId[0],
+      })
+      console.log(zoho_promise)
+    })
+    /*
+     * initializing the widget.
+     */
+    ZOHO.embeddedApp.init()
+
+    btnApi.addEventListener('click', () => {
+      var conn_name = 'invoicebooks'
+      var req_data = {
+        method: 'GET',
+        // @D url: 'https://books.zoho.com/api/v3/invoices/2156646000000611059?organization_id=709830857',
+        url: 'https://books.zoho.com/api/v3/invoices/888587000211849449?organization_id=651425182',
+      }
+      ZOHO.CRM.CONNECTION.invoke(conn_name, req_data).then(function (data) {
+        console.log(data)
+      })
+    })
+
+    btnSDK.addEventListener('click', () => {
+      ZOHO.CRM.API.getRecord({
+        Entity: 'Deals',
+        // RecordID: '4408531000000970020',
+        RecordID: '2234337000105397015',
+      }).then(function (data) {
+        console.log(data)
+      })
+    })
+
+    btnAsync.addEventListener('click', async () => {
+      const zoho_promise = await ZOHO.CRM.API.getRecord({
+        Entity: 'Deals',
+        // RecordID: '4408531000000970020',
+        RecordID: '2234337000105397015',
+      })
+      console.log(zoho_promise)
+    })
+
+    btnFunction.addEventListener('click', async () => {
+      console.log('Creando facturas capital intento 2...')
+      for (let i = 0; i < 10; i++) {
+        const zoho_promise = await ZOHO.CRM.FUNCTIONS.execute(
+          'creacionFacturasCapital',
+          {
+            arguments: JSON.stringify({
+              IDOportunidad: '2234337000105397015',
+              IDClienteBooks: '888587000033680404',
+              IDProductoBooks: '888587000011266039',
+              IDPresupuesto: '3260923000013805003',
+              Position: i,
+            }),
+          }
+        )
+        console.log(`Position: ${i}, ${zoho_promise}`)
+      }
+    })
+
+    btnElim.addEventListener('click', async () => {
+      console.log('Eliminando Facturas intento 2')
+      try {
+        const zoho_promise = await ZOHO.CRM.FUNCTIONS.execute('testAPI', {
+          arguments: JSON.stringify({
+            customer_name: 'ALEJANDRO MEZA ZAMORA',
+            item_name: 'VILLA PRUEBA M2-L2',
+            masFacturas: true,
+          }),
+        })
+        console.log(zoho_promise)
+      } catch (error) {
+        console.log(error)
+      }
+    })
+  </script>
+</html>
